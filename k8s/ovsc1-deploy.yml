@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: openvscode1
+  name: openvscode1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openvscode1
+  template:
+    metadata:
+      labels:
+        app: openvscode1
+    spec:
+      containers:
+      - image: codeserver:latest
+        imagePullPolicy: Never
+        name: openvscode-server
+        resources:
+          requests:
+            ephemeral-storage: "2Gi"
+        volumeMounts:
+        - name: ephemeral
+          mountPath: "/home/workspace:cached"
+        ports:
+          - containerPort: 3000
+        env:
+          - name: GITHUB_WORKSPACE
+            value: https://github.com/GlennTatum/angular-py.git
+          - name: BASE_URL
+            value: "1"
+      volumes:
+        - name: ephemeral
+          emptyDir:
+            sizeLimit: "4Gi"
+
+        
