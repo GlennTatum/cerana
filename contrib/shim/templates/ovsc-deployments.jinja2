@@ -1,0 +1,79 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ovsc-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: opencodeserver.com
+    http:
+      paths:
+    {% for service in svc %}
+      - backend:
+          service:
+              name: ovsc-service{{ service.index }}
+              port:
+                number: 3000
+        path: /{{ service.index }}(/|$)(.*)
+        pathType: Prefix
+    {% endfor %}
+---
+{% for service in svc %}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: openvscode{{ service.index }}
+  name: openvscode{{ service.index }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openvscode{{ service.index }}
+  template:
+    metadata:
+      labels:
+        app: openvscode{{ service.index }}
+    spec:
+      containers:
+      - image: codeserver:latest
+        imagePullPolicy: Never
+        name: openvscode-server
+        resources:
+          requests:
+            ephemeral-storage: "2Gi"
+        volumeMounts:
+        - name: ephemeral
+          mountPath: "/home/workspace:cached"
+        ports:
+          - containerPort: 3000
+        env:
+          - name: GITHUB_WORKSPACE
+            value: {{ github_workspace }}
+          - name: BASE_URL
+            value: "{{ service.index }}"
+      volumes:
+        - name: ephemeral
+          emptyDir:
+            sizeLimit: "4Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ovsc-service{{ service.index }}
+  name: ovsc-service{{ service.index }}
+spec:
+  ports:
+  - name: 80-3000
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: openvscode{{ service.index }}
+  type: ClusterIP
+---
+{% endfor %}

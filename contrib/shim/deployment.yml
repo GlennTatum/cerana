@@ -1,0 +1,268 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ovsc-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: opencodeserver.com
+    http:
+      paths:
+    
+      - backend:
+          service:
+              name: ovsc-service1
+              port:
+                number: 3000
+        path: /1(/|$)(.*)
+        pathType: Prefix
+    
+      - backend:
+          service:
+              name: ovsc-service2
+              port:
+                number: 3000
+        path: /2(/|$)(.*)
+        pathType: Prefix
+    
+      - backend:
+          service:
+              name: ovsc-service3
+              port:
+                number: 3000
+        path: /3(/|$)(.*)
+        pathType: Prefix
+    
+      - backend:
+          service:
+              name: ovsc-service4
+              port:
+                number: 3000
+        path: /4(/|$)(.*)
+        pathType: Prefix
+    
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: openvscode1
+  name: openvscode1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openvscode1
+  template:
+    metadata:
+      labels:
+        app: openvscode1
+    spec:
+      containers:
+      - image: codeserver:latest
+        imagePullPolicy: Never
+        name: openvscode-server
+        resources:
+          requests:
+            ephemeral-storage: "2Gi"
+        volumeMounts:
+        - name: ephemeral
+          mountPath: "/home/workspace:cached"
+        ports:
+          - containerPort: 3000
+        env:
+          - name: GITHUB_WORKSPACE
+            value: https://github.com/GlennTatum/angular-py
+          - name: BASE_URL
+            value: "1"
+      volumes:
+        - name: ephemeral
+          emptyDir:
+            sizeLimit: "4Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ovsc-service1
+  name: ovsc-service1
+spec:
+  ports:
+  - name: 80-3000
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: openvscode1
+  type: ClusterIP
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: openvscode2
+  name: openvscode2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openvscode2
+  template:
+    metadata:
+      labels:
+        app: openvscode2
+    spec:
+      containers:
+      - image: codeserver:latest
+        imagePullPolicy: Never
+        name: openvscode-server
+        resources:
+          requests:
+            ephemeral-storage: "2Gi"
+        volumeMounts:
+        - name: ephemeral
+          mountPath: "/home/workspace:cached"
+        ports:
+          - containerPort: 3000
+        env:
+          - name: GITHUB_WORKSPACE
+            value: https://github.com/GlennTatum/angular-py
+          - name: BASE_URL
+            value: "2"
+      volumes:
+        - name: ephemeral
+          emptyDir:
+            sizeLimit: "4Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ovsc-service2
+  name: ovsc-service2
+spec:
+  ports:
+  - name: 80-3000
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: openvscode2
+  type: ClusterIP
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: openvscode3
+  name: openvscode3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openvscode3
+  template:
+    metadata:
+      labels:
+        app: openvscode3
+    spec:
+      containers:
+      - image: codeserver:latest
+        imagePullPolicy: Never
+        name: openvscode-server
+        resources:
+          requests:
+            ephemeral-storage: "2Gi"
+        volumeMounts:
+        - name: ephemeral
+          mountPath: "/home/workspace:cached"
+        ports:
+          - containerPort: 3000
+        env:
+          - name: GITHUB_WORKSPACE
+            value: https://github.com/GlennTatum/angular-py
+          - name: BASE_URL
+            value: "3"
+      volumes:
+        - name: ephemeral
+          emptyDir:
+            sizeLimit: "4Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ovsc-service3
+  name: ovsc-service3
+spec:
+  ports:
+  - name: 80-3000
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: openvscode3
+  type: ClusterIP
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: openvscode4
+  name: openvscode4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openvscode4
+  template:
+    metadata:
+      labels:
+        app: openvscode4
+    spec:
+      containers:
+      - image: codeserver:latest
+        imagePullPolicy: Never
+        name: openvscode-server
+        resources:
+          requests:
+            ephemeral-storage: "2Gi"
+        volumeMounts:
+        - name: ephemeral
+          mountPath: "/home/workspace:cached"
+        ports:
+          - containerPort: 3000
+        env:
+          - name: GITHUB_WORKSPACE
+            value: https://github.com/GlennTatum/angular-py
+          - name: BASE_URL
+            value: "4"
+      volumes:
+        - name: ephemeral
+          emptyDir:
+            sizeLimit: "4Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ovsc-service4
+  name: ovsc-service4
+spec:
+  ports:
+  - name: 80-3000
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: openvscode4
+  type: ClusterIP
+---
+

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: openvscode{{ service.index }}
+  name: openvscode{{ service.index }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openvscode{{ service.index }}
+  template:
+    metadata:
+      labels:
+        app: openvscode{{ service.index }}
+    spec:
+      containers:
+      - image: codeserver:latest
+        imagePullPolicy: Never
+        name: openvscode-server
+        resources:
+          requests:
+            ephemeral-storage: "2Gi"
+        volumeMounts:
+        - name: ephemeral
+          mountPath: "/home/workspace:cached"
+        ports:
+          - containerPort: 3000
+        env:
+          - name: GITHUB_WORKSPACE
+            value: {{ github_workspace }}
+          - name: BASE_URL
+            value: "{{ service.index }}"
+      volumes:
+        - name: ephemeral
+          emptyDir:
+            sizeLimit: "4Gi"
+
+        
