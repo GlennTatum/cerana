@@ -1,0 +1,1 @@
+Notes: Pods may have to be restarted due to the ephemeral mount being retaken, just delete and redeploy the pod
