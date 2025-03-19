@@ -23,6 +23,10 @@ sudo apt install python3.11-venv
 
 curl https://releases.rancher.com/install-docker/27.5.sh | sh
 
+# install nginx ingress controller
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.48.1/deploy/static/provider/baremetal/deploy.yaml
+
 # it should already be deployed
 
 ~/cerana/k8s/gitpod$ sudo docker build . -t glenntatum/opencodeserver:latest
