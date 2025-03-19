@@ -15,7 +15,7 @@ spec:
         app: openvscode{{ service.index }}
     spec:
       containers:
-      - image: codeserver:latest
+      - image: glenntatum/opencodeserver:latest
         imagePullPolicy: Never
         name: openvscode-server
         resources:
